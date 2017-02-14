@@ -1,0 +1,345 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib import style
+import numpy as np
+plt.switch_backend('TkAgg')
+style.use('ggplot')
+
+def program():
+    run = True
+
+    #Making this DataFrame for later use, it is dedicated to group averages
+    df_avg = pd.DataFrame()
+
+    while run:
+        print("----- Main Menu -----")
+        print("\n")
+        print("1) To load in an array from txt.")
+        print("2) Delete redundant columns.")
+        print("3) Make a plot.")
+        print("4) Look at current table.")
+        print("5) Save current DataFrame as .txt or .xlsx ")
+        print("6) Make distance calculation in new column.")
+        print("7) Automatically clean current tables.")
+        print("9) To exit")
+        print("\n")
+        user_choice = eval(input("What would you like to do?:"))
+
+        if user_choice == 1:
+            file_name = input("Which file would you like to analyze?")
+            df = pd.read_csv(file_name, sep="\t", header=0, )
+
+        if user_choice == 2:
+            remove = eval(input("How many columns do you want to delete?:"))
+
+            for i in range(0, remove):
+                drop_name = input("Name the column you want to remove:")
+                try:
+                    df.drop([drop_name], axis=1, inplace=True)
+                except:
+                    print("name did not match any columns")
+
+        if user_choice == 3:
+            plot_run = True
+
+            while plot_run:
+                print("\n")
+                print("#####  Welcome to the plotting main menu  #####")
+                print("\n")
+                print("1) Scatterplot: Make reference plot (do this first).")
+                print("2) Scatterplot: To add a fish to your plot.")
+                print("3) Scatterplot: Look at current plot.")
+                print("4) Bar plot: Make a bar plot from desired columns.")
+                print("5) Automatically make bar plot of all distance columns.")
+                print("6) Line plot, pixels as Y and frames as X.")
+                print("9) Exit plot menu")
+                print("\n")
+
+                plot_choice = eval(input("What would you like to do?: "))
+
+                if plot_choice == 1:
+                    x_axis = input("Name of x-axis: ")
+                    y_axis = input("Name of y-axis: ")
+                    color_fish = input("Chose fish color: ")
+                    label_fish = input("Label: ")
+
+                    try:
+                        ax = df.plot(kind="scatter", x=x_axis, y=y_axis, label=label_fish, color=color_fish, marker=".")
+
+                    except:
+                        print("Something went wrong with the plot.")
+
+                if plot_choice == 2:
+                    x_axis = input("Name of x-axis: ")
+                    y_axis = input("Name of y-axis: ")
+                    color_fish = input("Chose fish color: ")
+                    label_fish = input("Label: ")
+
+                    try:
+                        df.plot(kind="scatter", x=x_axis, y=y_axis, label=label_fish, color=color_fish, marker=".", ax=ax)
+
+                    except:
+                        print("Something went wrong with the plot.")
+
+                if plot_choice == 3:
+                    try:
+                        plt.xlabel("Pixels")
+                        plt.ylabel("Pixels")
+                        plt.show()
+
+                    except:
+                        print("Something went wrong, perhaps there is no plot to show.")
+
+                if plot_choice == 4:
+                    antall_bar = eval(input("How many columns do you want to plot?: "))
+                    bar_df = pd.DataFrame
+                    bar_dict = {}
+
+                    for bars in range(0, antall_bar):
+                        name_bar = input("Which column would you like to plot?: ")
+                        #name_bar = "dist_fisk_" + str(bars)
+                        label_bar = input("Label: ")
+                        #label_bar = "Fisk_" + str(bars)
+                        #bar_plot = pd.DataFrame.sum(df[name_bar])
+                        #bar_plot.plot.bar(label=label_bar)
+                        sum_col = pd.DataFrame.sum(df[name_bar])
+                        bar_dict[label_bar] = sum_col
+
+                    list_dict = [bar_dict]
+                    bar_df = pd.DataFrame(list_dict)
+                    #bar_df = pd.DataFrame.from_dict(bar_dict, orient="index")
+                    #bar_df.plot(type="bar")
+                    bar_df.plot.bar()
+                    plt.show()
+
+                if plot_choice == 5:
+                    antall_bar = eval(input("How many fish are there to plot?: "))
+
+                    try:
+
+                        bar_df = pd.DataFrame
+                        bar_dict = {}
+
+                        for bars in range(1, antall_bar+1):
+                            name_bar = "dist_fish_" + str(bars)
+                            label_bar = "Fish-" + str(bars)
+                            sum_col = pd.DataFrame.sum(df[name_bar])
+                            bar_dict[label_bar] = sum_col
+
+                        list_dict = [bar_dict]
+                        bar_df = pd.DataFrame(list_dict)
+                        bar_df.plot.bar()
+                        plt.show()
+
+
+                    except:
+                        print("Something went wrong!!!!")
+
+                '''
+                        This choice for making a line plot
+                '''
+
+                if plot_choice == 6:
+                    print("1) Line plot of all fish in current group.")
+                    print("2) Line plot of group averages in the 'df_avg' DataFrame.")
+                    line_choice = eval(input("Which line plot would you like?: "))
+
+                    if line_choice == 1:
+                        #Taking the cumulative sum over columns and making a new DataFrame to use for line plot
+                        df2 = df.cumsum()
+                        cols = [c for c in df2.columns if c.lower()[:4] == 'dist']
+                        cols = cols + [c for c in df2.columns if c.lower()[:5] == 'group']
+                        df2 = df2[cols]
+
+                        ax = df2.plot(title="Total distance in pixels over frames, per fish")
+
+                    if line_choice == 2:
+                        # Taking the cumulative sum over columns and making a new DataFrame to use for line plot
+                        df2 = df_avg.cumsum()
+                        #cols = [c for c in df2.columns if c.lower()[:4] == 'dist']
+                        #cols = cols + [c for c in df2.columns if c.lower()[:5] == 'group']
+                        #df2 = df2[cols]
+
+                        ax = df2.plot(title="Total distance in pixels over frames, per group of fish")
+
+                ax.set_xlabel("Time(frames)")
+                ax.set_ylabel("Distance(pixels)")
+                plt.show()
+                    
+                if plot_choice == 9:
+                    plot_run = False
+
+
+        if user_choice == 4:
+            try:
+                print(df)
+            except:
+                print("No DataFrame found!, returning to main menu.")
+
+        if user_choice == 5:
+            print("1) to save as .txt")
+            print("2) to save as excel format.")
+            format_choice = eval(input("Which format to save in (1 or 2)?: "))
+
+
+            if format_choice == 1:
+                try:
+                    new_name = input("New file name (must end with .txt): ")
+                    df = df.round(2)
+                    df.to_csv(new_name, sep="\t", index=False)
+                except:
+                    print("Something went wrong :( ")
+
+            if format_choice == 2:
+                try:
+                    new_name = input("New file name (must en with .xlsx): ")
+                    writer = pd.ExcelWriter(new_name, engine="xlsxwriter")
+                    df = df.round(2)
+                    df.to_excel(writer, "Sheet-main")
+                    df_avg.to_excel(writer, "Sheet-group-avg")
+                    writer.save()
+                except:
+                    print("Something went wrong.")
+
+        if user_choice == 6:
+            distance_menu = True
+            while distance_menu:
+                print("\n")
+                print("#### Welcome to the distance calculations menu ####")
+                print("\n")
+                print("1) Make a new column calculating distance traveled for fish in x and y directions.")
+                print("2) Make a column with the distance traveled per frame from x and y values.")
+                print("3) Sum distance for all frames for a columns.")
+                print("4) Make x- and y-distance columns automatically.")
+                print("5) Make total distance per frame calculations automatically.")
+                print("6) Do group average distances. ")
+                print("9) Exit menu")
+                print("\n")
+
+                distance_menu_choice = eval(input("What would you like to do?: "))
+
+                if distance_menu_choice == 1:
+                    fish_x = input("Name x-axis of fish: ")
+                    fish_y = input("Name y-axis of fish: ")
+                    new_column_name_x = input("Enter name of new column x-axis: ")
+                    new_column_name_y = input("Enter name of new column y-axis: ")
+
+                    try:
+                        df[new_column_name_x] = df[fish_x].diff()
+                        df[new_column_name_y] = df[fish_y].diff()
+
+                        #Make Them Smooth
+
+                        df.ix[df[new_column_name_x] < 1, new_column_name_x] = 0
+                        df.ix[df[new_column_name_y] < 1, new_column_name_y] = 0
+                    except:
+                        print("Something went wrong :( ")
+
+
+                if distance_menu_choice == 2:
+                    dist_axis = input("What do you want to call the new column?: ")
+                    dist_ax_x = input("Which column represents movement in X direction?: ")
+                    dist_ax_y = input("Which column represents movement in Y direction?: ")
+                    try:
+                        df[dist_axis] = df[dist_ax_x] ** 2 + df[dist_ax_y] ** 2
+                        df[dist_axis] = np.sqrt(df[dist_axis])
+                    except:
+                        print("Ups, something went wrong...")
+
+                if distance_menu_choice == 3:
+                    sum_column = input("Which column do you want to take the sum of?: ")
+                    try:
+                        sum_num = pd.DataFrame.sum(df[sum_column])
+                        print("The sum of all numbers in this column is: " + str(sum_num))
+                    except:
+                        print("Uh, something went terribly wrong.")
+
+                if distance_menu_choice == 4:
+                    antall_fisk = eval(input("How many fishes do you want to use?: "))
+
+                    for rad in range(1, antall_fisk+1):
+                        fish_x = "X" + str(rad)
+                        fish_y = "Y" + str(rad)
+                        new_column_name_x = "x_dist_" + str(rad)
+                        new_column_name_y = "y_dist_" + str(rad)
+
+                        try:
+                            df[new_column_name_x] = df[fish_x].diff()
+                            df[new_column_name_y] = df[fish_y].diff()
+
+                            #Make Them Smooth
+
+                            df.ix[df[new_column_name_x] < 1, new_column_name_x] = 0
+                            df.ix[df[new_column_name_y] < 1, new_column_name_y] = 0
+
+                        except:
+                            print("Oh noes, that did not go as planned!")
+
+                if distance_menu_choice == 5:
+                    antall_fisk = eval(input("How many fish to calculate the total distance for?: "))
+
+                    for fisk in range(1, antall_fisk+1):
+                        dist_axis = "dist_fish_" + str(fisk)
+                        dist_ax_x = "x_dist_" + str(fisk)
+                        dist_ax_y = "y_dist_" + str(fisk)
+                        try:
+                            df[dist_axis] = df[dist_ax_x] ** 2 + df[dist_ax_y] ** 2
+                            df[dist_axis] = np.sqrt(df[dist_axis])
+                        except:
+                            print("Ups, something went wrong...")
+
+                # - Mean distance for group -
+
+                if distance_menu_choice == 6:
+                    print("NOTE: This step will create a new column")
+                    print("It will also create a new DataFrame called 'df_avg' where it will")
+                    print("make this group's average appear, this is so that you can load")
+                    print("a different group and do the same calculation, and now have both")
+                    print("averages in the same DataFrame to compare them more easily.")
+
+                    col_avg_name = "group_avg_dist_" + input("Name your group average column: ")
+                    print("New column was named: " + col_avg_name)
+
+
+                    try:
+                        cols = [c for c in df.columns if c.lower()[:4] == 'dist']
+                        df[col_avg_name] = df[cols].mean(axis=1)
+                        print("")
+                        print("Total mean distance for the group:")
+                        print(df[col_avg_name].sum())
+                        print("Pixels over " + str(len(df.index)) + " frames.")
+                        print("")
+                        df_avg[col_avg_name] = df[col_avg_name]
+                        print("Column " + col_avg_name + " was added to the DataFrame 'df_avg'.")
+
+                    except:
+                        print("Something went wrong")
+
+                if distance_menu_choice == 9:
+                    distance_menu = False
+                    print("Exiting distance menu..")
+
+        if user_choice == 7:
+            cols = [c for c in df.columns if c.lower()[:3] != 'pro']
+            df = df[cols]
+            cols = [c for c in df.columns if c.lower()[:3] != 'unn']
+            df = df[cols]
+
+            #for i in range(0, remove):
+                #drop_name = input("Name the column you want to remove:")
+                #try:
+                    #df.drop([drop_name], axis=1, inplace=True)
+                #except:
+                    #print("name did not match any columns")
+
+
+        if user_choice == 9:
+            run = False
+            print("Exiting program..")
+
+
+program()
+
+
+
+

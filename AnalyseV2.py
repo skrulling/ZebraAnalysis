@@ -27,7 +27,10 @@ def program():
 
         if user_choice == 1:
             file_name = input("Which file would you like to analyze?")
-            df = pd.read_csv(file_name, sep="\t", header=0, )
+            try:
+                df = pd.read_csv(file_name, sep="\t", header=0, )
+            except:
+                print("Could not find that file, is it located in the same folder as the program?")
 
         if user_choice == 2:
             remove = eval(input("How many columns do you want to delete?:"))

@@ -5,6 +5,25 @@ import numpy as np
 plt.switch_backend('TkAgg')
 style.use('ggplot')
 
+def refine_df(dataframe, key_wrd, key_num):
+    cols = [c for c in dataframe.columns if c.lower()[:key_num] == key_wrd]
+    dataframe = dataframe[cols]
+
+    return dataframe
+
+def count_fish(dataframe, key_wrd, key_num):
+    fish_count = 0
+
+    for c in dataframe.columns:
+        if c.lower()[:key_num] == key_wrd:
+            fish_count = fish_count + 1
+
+        else:
+            continue
+
+    return fish_count
+
+
 def clean_calc(dataframe, num_fish):
 
     cols = [c for c in dataframe.columns if c.lower()[:3] != 'pro']
@@ -108,6 +127,12 @@ def program():
                 except:
                     print("name did not match any columns")
 
+
+
+    # --------------- PLOTTING MENU ---------------------
+
+
+
         if user_choice == 3:
             plot_run = True
 
@@ -115,73 +140,49 @@ def program():
                 print("\n")
                 print("#####  Welcome to the plotting main menu  #####")
                 print("\n")
-                print("1) Scatterplot: Make reference plot (do this first).")
-                print("2) Scatterplot: To add a fish to your plot.")
-                print("3) Scatterplot: Look at current plot.")
-                print("4) Bar plot: Make a bar plot from desired columns.")
-                print("5) Automatically make bar plot of all distance columns.")
-                print("6) Line plot, pixels as Y and frames as X.")
+                print("1) Bar plot: Make a bar plot from desired columns.")
+                print("2) Automatically make bar plot of all distance columns.")
+                print("3) Line plot, pixels as Y and frames as X.")
                 print("9) Exit plot menu")
                 print("\n")
 
                 plot_choice = eval(input("What would you like to do?: "))
+                print("")
+
+
 
                 if plot_choice == 1:
-                    x_axis = input("Name of x-axis: ")
-                    y_axis = input("Name of y-axis: ")
-                    color_fish = input("Chose fish color: ")
-                    label_fish = input("Label: ")
-
-                    try:
-                        ax = df.plot(kind="scatter", x=x_axis, y=y_axis, label=label_fish, color=color_fish, marker=".")
-
-                    except:
-                        print("Something went wrong with the plot.")
-
-                if plot_choice == 2:
-                    x_axis = input("Name of x-axis: ")
-                    y_axis = input("Name of y-axis: ")
-                    color_fish = input("Chose fish color: ")
-                    label_fish = input("Label: ")
-
-                    try:
-                        df.plot(kind="scatter", x=x_axis, y=y_axis, label=label_fish, color=color_fish, marker=".", ax=ax)
-
-                    except:
-                        print("Something went wrong with the plot.")
-
-                if plot_choice == 3:
-                    try:
-                        plt.xlabel("Pixels")
-                        plt.ylabel("Pixels")
-                        plt.show()
-
-                    except:
-                        print("Something went wrong, perhaps there is no plot to show.")
-
-                if plot_choice == 4:
                     antall_bar = eval(input("How many columns do you want to plot?: "))
                     bar_df = pd.DataFrame
                     bar_dict = {}
 
                     for bars in range(0, antall_bar):
-                        name_bar = input("Which column would you like to plot?: ")
-                        #name_bar = "dist_fisk_" + str(bars)
-                        label_bar = input("Label: ")
-                        #label_bar = "Fisk_" + str(bars)
-                        #bar_plot = pd.DataFrame.sum(df[name_bar])
-                        #bar_plot.plot.bar(label=label_bar)
-                        sum_col = pd.DataFrame.sum(df[name_bar])
-                        bar_dict[label_bar] = sum_col
+                        try:
 
-                    list_dict = [bar_dict]
-                    bar_df = pd.DataFrame(list_dict)
-                    #bar_df = pd.DataFrame.from_dict(bar_dict, orient="index")
-                    #bar_df.plot(type="bar")
-                    bar_df.plot.bar()
-                    plt.show()
+                            name_bar = input("Which column would you like to plot?: ")
+                            #name_bar = "dist_fisk_" + str(bars)
+                            label_bar = input("Label: ")
+                            #label_bar = "Fisk_" + str(bars)
+                            #bar_plot = pd.DataFrame.sum(df[name_bar])
+                            #bar_plot.plot.bar(label=label_bar)
+                            sum_col = pd.DataFrame.sum(df[name_bar])
+                            bar_dict[label_bar] = sum_col
+                        except:
+                            print("something went wrong.")
+                            pass
+                    try:
+                        list_dict = [bar_dict]
+                        bar_df = pd.DataFrame(list_dict)
+                        #bar_df = pd.DataFrame.from_dict(bar_dict, orient="index")
+                        #bar_df.plot(type="bar")
+                        bar_df.plot.bar()
+                        plt.show()
+                    except:
+                        print("Something went wrong with the plotting.")
 
-                if plot_choice == 5:
+             #   --------   AUTO BAR PLOT ------------
+
+                if plot_choice == 2:
                     print("1) Make a bar plot using each fish.")
                     print("2) Make a bar plot using groups found in 'df_avg'.")
                     print("")
@@ -189,9 +190,13 @@ def program():
                     print("")
 
                     if bar_choice == 1:
+                        print("Do you want standard deviation included in plot?")
+                        error_choice = eval(input("'1' for YES, '0' for NO: "))
 
-                        antall_bar = eval(input("How many fish are there to plot?: "))
-
+                        try:
+                            antall_bar = count_fish(df, "dist", 4)
+                        except:
+                            print("Error, could not find fish count.")
                         try:
 
                             bar_df = pd.DataFrame
@@ -205,8 +210,22 @@ def program():
 
                             list_dict = [bar_dict]
                             bar_df = pd.DataFrame(list_dict)
-                            bar_df.plot.bar()
-                            plt.show()
+                            if error_choice == 0:
+
+                                ax = bar_df.plot.bar(title="Total distance covered per fish")
+                                ax.set_xlabel("Fisk")
+                                ax.set_ylabel("Distance (pixels)")
+                                plt.show()
+
+                            elif error_choice == 1:
+                                #bar_df = refine_df(bar_df, )
+                                error = bar_df.std(axis=1)
+                                print(error)
+                                ax = bar_df.plot.bar(yerr=error, title="Total distance covered per fish", colormap='Dark2')
+                                ax.set_xlabel("Fisk")
+                                ax.set_ylabel("Distance (pixels)")
+                                plt.show()
+
 
 
                         except:
@@ -214,7 +233,9 @@ def program():
 
                     if bar_choice == 2:
                         try:
-                            df_avg.plot.bar()
+                            ax = df_avg.plot.bar(title="Average total distance covered per group")
+                            ax.set_ylabel("Distance (pixels)")
+                            ax.set_xlabel("Groups")
                             plt.show()
 
                         except:
@@ -222,11 +243,11 @@ def program():
 
 
 
-                '''
-                        This choice for making a line plot
-                '''
 
-                if plot_choice == 6:
+             #  ---------         This choice for making a line plot       ---------
+
+
+                if plot_choice == 3:
                     print("1) Line plot of all fish in current group.")
                     print("2) Line plot of group averages in the 'df_avg' DataFrame.")
                     line_choice = eval(input("Which line plot would you like?: "))
@@ -259,6 +280,8 @@ def program():
                 print(df)
             except:
                 print("No DataFrame found!, returning to main menu.")
+
+        # -------------- SAVE FUNCTION ---------------
 
         if user_choice == 5:
             print("1) to save as .txt")
@@ -295,6 +318,10 @@ def program():
                     writer.save()
                 except:
                     print("Something went wrong.")
+
+
+        # ----------- DISTANCE CALCULATIONS MENU -------------------
+
 
         if user_choice == 6:
             distance_menu = True
@@ -351,10 +378,17 @@ def program():
                     print("Exiting distance menu..")
 
         if user_choice == 8:
-            num_fish = eval(input("How many fish are in this group?: "))
+            #num_fish = eval(input("How many fish are in this group?: "))
+            try:
+                #Looks for all columns starting with 'x', and assuming this is the x-coordinate column
+                #for a fish, so it counts it. If other columns start with 'x', count will be wrong.
+                num_fish_count = count_fish(df, "x", 1)
+                print(num_fish_count)
+            except:
+                print("Error, could not find number of fish in dataframe.")
 
             try:
-                df = clean_calc(df, num_fish)
+                df = clean_calc(df, num_fish_count)
                 print("DataFrame has been cleaned and distance calculations have been made.")
             except:
 

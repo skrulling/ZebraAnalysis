@@ -5,11 +5,13 @@ import numpy as np
 plt.switch_backend('TkAgg')
 style.use('ggplot')
 
+
 def refine_df(dataframe, key_wrd, key_num):
     cols = [c for c in dataframe.columns if c.lower()[:key_num] == key_wrd]
     dataframe = dataframe[cols]
 
     return dataframe
+
 
 def count_fish(dataframe, key_wrd, key_num):
     fish_count = 0
@@ -192,6 +194,7 @@ def program():
                     if bar_choice == 1:
                         print("Do you want standard deviation included in plot?")
                         error_choice = eval(input("'1' for YES, '0' for NO: "))
+                        print("")
 
                         try:
                             antall_bar = count_fish(df, "dist", 4)
@@ -211,20 +214,31 @@ def program():
                             list_dict = [bar_dict]
                             bar_df = pd.DataFrame(list_dict)
                             if error_choice == 0:
+                                try:
 
-                                ax = bar_df.plot.bar(title="Total distance covered per fish")
-                                ax.set_xlabel("Fisk")
-                                ax.set_ylabel("Distance (pixels)")
-                                plt.show()
+                                    ax = bar_df.plot.bar(title="Total distance covered per fish")
+                                    ax.set_xlabel("Fisk")
+                                    ax.set_ylabel("Distance (pixels)")
+                                    plt.show()
+
+                                except:
+                                    print("Error")
 
                             elif error_choice == 1:
-                                #bar_df = refine_df(bar_df, )
-                                error = bar_df.std(axis=1)
-                                print(error)
-                                ax = bar_df.plot.bar(yerr=error, title="Total distance covered per fish", colormap='Dark2')
-                                ax.set_xlabel("Fisk")
-                                ax.set_ylabel("Distance (pixels)")
-                                plt.show()
+
+                                try:
+                                    #bar_df = refine_df(bar_df, )
+                                    error = bar_df.std(axis=1)
+                                    print("The standard deviation over total distance traveled for the fish is:")
+                                    print(error)
+                                    ax = bar_df.plot.bar(yerr=error, title="Total distance covered per fish",
+                                                         colormap='Dark2')
+                                    ax.set_xlabel("Fisk")
+                                    ax.set_ylabel("Distance (pixels)")
+                                    plt.show()
+
+                                except:
+                                    print("Something went wrong with the plot.")
 
 
 
@@ -232,14 +246,39 @@ def program():
                             print("Something went wrong!!!!")
 
                     if bar_choice == 2:
-                        try:
-                            ax = df_avg.plot.bar(title="Average total distance covered per group")
-                            ax.set_ylabel("Distance (pixels)")
-                            ax.set_xlabel("Groups")
-                            plt.show()
 
-                        except:
-                            print("Something went wrong with the plotting.")
+                        print("Do you want standard deviation included in plot?")
+                        error_choice = eval(input("'1' for YES, '0' for NO: "))
+                        print("")
+
+                        if error_choice == 0:
+                            try:
+                                df_avg_bar = df_avg.sum()
+                                ax = df_avg_bar.plot.bar(title="Average total distance covered per group",
+                                                         colormap='Dark2')
+                                #ax.set_ylabel("Distance (pixels)")
+                                #ax.set_xlabel("Groups")
+                                #plt.show()
+
+                            except:
+                                print("Something went wrong with the plotting.")
+
+                        elif error_choice == 1:
+                            try:
+                                df_avg_bar = df_avg.sum()
+                                error = df_avg_bar.std(axis=1)
+                                ax = df_avg_bar.plot.bar(yerr=error, title="Average total distance covered per group",
+                                                         colormap='Dark2')
+                                #ax.set_ylabel("Distance (pixels)")
+                               # ax.set_xlabel("Groups")
+                                #plt.show()
+
+                            except:
+                                print("Something went wrong with the plot.")
+
+                        ax.set_ylabel("Distance (pixels)")
+                        ax.set_xlabel("Groups")
+                        plt.show()
 
 
 
@@ -255,21 +294,26 @@ def program():
                     if line_choice == 1:
                         #Taking the cumulative sum over columns and making a new DataFrame to use for line plot
                         df2 = df.cumsum()
-                        cols = [c for c in df2.columns if c.lower()[:4] == 'dist']
-                        cols = cols + [c for c in df2.columns if c.lower()[:5] == 'group']
-                        df2 = df2[cols]
+                        #cols = [c for c in df2.columns if c.lower()[:4] == 'dist']
+                        #cols = cols + [c for c in df2.columns if c.lower()[:5] == 'group']
+                        #df2 = df2[cols]
+                        #print(df2)
+                        df2 = refine_df(df2, 'dist', 4)
+                        #print(df2)
+                        #df2 = refine_df(df2, 'group', 5)
+                        #print(df2)
 
-                        ax = df2.plot(title="Total distance in pixels over frames, per fish")
+                        ax = df2.plot(title="Total distance in pixels over frames, per fish", colormap='Dark2')
 
-                    if line_choice == 2:
+                    elif line_choice == 2:
                         # Taking the cumulative sum over columns and making a new DataFrame to use for line plot
                         df2 = df_avg.cumsum()
 
-                        ax = df2.plot(title="Total distance in pixels over frames, per group of fish")
+                        ax = df2.plot(title="Total distance in pixels over frames, per group of fish", colormap='Dark2')
 
-                ax.set_xlabel("Time(frames)")
-                ax.set_ylabel("Distance(pixels)")
-                plt.show()
+                    ax.set_xlabel("Time(frames)")
+                    ax.set_ylabel("Distance(pixels)")
+                    plt.show()
                     
                 if plot_choice == 9:
                     plot_run = False

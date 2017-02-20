@@ -17,7 +17,7 @@ def count_fish(dataframe, key_wrd, key_num):
     fish_count = 0
 
     for c in dataframe.columns:
-        if c.lower()[:key_num] == key_wrd:
+        if c[:key_num] == key_wrd:
             fish_count = fish_count + 1
 
         else:
@@ -75,10 +75,10 @@ def program():
         print("\n")
         print("1) To load in an array from .txt")
         print("2) Delete redundant columns.")
-        print("3) Make a plot.")
+        print("3) Plot/graph menu.")
         print("4) Look at current table.")
         print("5) Save current DataFrame as .txt or .xlsx ")
-        print("6) Make distance calculation in new column.")
+        print("6) Distance calculation menu.")
         print("8) Clean tables and make distance calculations for each fish")
         print("9) To exit the program")
         print("\n")
@@ -99,7 +99,7 @@ def program():
                     print("")
                     load_run = False
 
-                print("Do you have a group average .txt to load aswell?")
+                print("Do you have a group average .txt to load as well?")
                 print("If not: press 'ENTER'")
                 print("If you do, type name the filename (ending with .txt).")
                 print("")
@@ -145,6 +145,7 @@ def program():
                 print("1) Bar plot: Make a bar plot from desired columns.")
                 print("2) Automatically make bar plot of all distance columns.")
                 print("3) Line plot, pixels as Y and frames as X.")
+                print("4) Hex density plot")
                 print("9) Exit plot menu")
                 print("\n")
 
@@ -162,11 +163,7 @@ def program():
                         try:
 
                             name_bar = input("Which column would you like to plot?: ")
-                            #name_bar = "dist_fisk_" + str(bars)
                             label_bar = input("Label: ")
-                            #label_bar = "Fisk_" + str(bars)
-                            #bar_plot = pd.DataFrame.sum(df[name_bar])
-                            #bar_plot.plot.bar(label=label_bar)
                             sum_col = pd.DataFrame.sum(df[name_bar])
                             bar_dict[label_bar] = sum_col
                         except:
@@ -175,8 +172,6 @@ def program():
                     try:
                         list_dict = [bar_dict]
                         bar_df = pd.DataFrame(list_dict)
-                        #bar_df = pd.DataFrame.from_dict(bar_dict, orient="index")
-                        #bar_df.plot(type="bar")
                         bar_df.plot.bar()
                         plt.show()
                     except:
@@ -216,7 +211,8 @@ def program():
                             if error_choice == 0:
                                 try:
 
-                                    ax = bar_df.plot.bar(title="Total distance covered per fish")
+                                    ax = bar_df.plot.bar(title="Total distance covered per fish",
+                                                         colormap='Vega20b')
                                     ax.set_xlabel("Fisk")
                                     ax.set_ylabel("Distance (pixels)")
                                     plt.show()
@@ -232,15 +228,13 @@ def program():
                                     print("The standard deviation over total distance traveled for the fish is:")
                                     print(error)
                                     ax = bar_df.plot.bar(yerr=error, title="Total distance covered per fish",
-                                                         colormap='Dark2')
+                                                         colormap='Vega20b')
                                     ax.set_xlabel("Fisk")
                                     ax.set_ylabel("Distance (pixels)")
                                     plt.show()
 
                                 except:
                                     print("Something went wrong with the plot.")
-
-
 
                         except:
                             print("Something went wrong!!!!")
@@ -255,10 +249,7 @@ def program():
                             try:
                                 df_avg_bar = df_avg.sum()
                                 ax = df_avg_bar.plot.bar(title="Average total distance covered per group",
-                                                         colormap='Dark2')
-                                #ax.set_ylabel("Distance (pixels)")
-                                #ax.set_xlabel("Groups")
-                                #plt.show()
+                                                         colormap='Vega20b')
 
                             except:
                                 print("Something went wrong with the plotting.")
@@ -266,12 +257,11 @@ def program():
                         elif error_choice == 1:
                             try:
                                 df_avg_bar = df_avg.sum()
-                                error = df_avg_bar.std(axis=1)
+                                error = df_avg_bar.std(axis=0)
+                                print("The standard deviation over the groups is:")
+                                print(error)
                                 ax = df_avg_bar.plot.bar(yerr=error, title="Average total distance covered per group",
-                                                         colormap='Dark2')
-                                #ax.set_ylabel("Distance (pixels)")
-                               # ax.set_xlabel("Groups")
-                                #plt.show()
+                                                         colormap='Vega20b')
 
                             except:
                                 print("Something went wrong with the plot.")
@@ -294,26 +284,37 @@ def program():
                     if line_choice == 1:
                         #Taking the cumulative sum over columns and making a new DataFrame to use for line plot
                         df2 = df.cumsum()
-                        #cols = [c for c in df2.columns if c.lower()[:4] == 'dist']
-                        #cols = cols + [c for c in df2.columns if c.lower()[:5] == 'group']
-                        #df2 = df2[cols]
-                        #print(df2)
                         df2 = refine_df(df2, 'dist', 4)
-                        #print(df2)
-                        #df2 = refine_df(df2, 'group', 5)
-                        #print(df2)
 
-                        ax = df2.plot(title="Total distance in pixels over frames, per fish", colormap='Dark2')
+                        ax = df2.plot(title="Total distance in pixels over frames, per fish",
+                                      colormap='Vega20b')
 
                     elif line_choice == 2:
                         # Taking the cumulative sum over columns and making a new DataFrame to use for line plot
                         df2 = df_avg.cumsum()
 
-                        ax = df2.plot(title="Total distance in pixels over frames, per group of fish", colormap='Dark2')
+                        ax = df2.plot(title="Total distance in pixels over frames, per group of fish",
+                                      colormap='Vega20b')
 
                     ax.set_xlabel("Time(frames)")
                     ax.set_ylabel("Distance(pixels)")
                     plt.show()
+
+                # ------- Hex Density Plot ---------
+
+                if plot_choice == 4:
+                    try:
+                        hex_fish = eval(input("Which fish would you like to plot?(enter number): "))
+                        ax = df.plot.hexbin(x='X'+str(hex_fish), y='Y'+str(hex_fish), gridsize=15,
+                                            title="Fisk-"+str(hex_fish))
+                    except:
+                        print("Something went wrong with the plot. Perhaps chosen fish number is"
+                              " invalid")
+
+                ax.set_xlabel("x-coordinates")
+                ax.set_ylabel("y-coordinates")
+                plt.show()
+
                     
                 if plot_choice == 9:
                     plot_run = False
@@ -426,7 +427,7 @@ def program():
             try:
                 #Looks for all columns starting with 'x', and assuming this is the x-coordinate column
                 #for a fish, so it counts it. If other columns start with 'x', count will be wrong.
-                num_fish_count = count_fish(df, "x", 1)
+                num_fish_count = count_fish(df, "X", 1)
                 print(num_fish_count)
             except:
                 print("Error, could not find number of fish in dataframe.")

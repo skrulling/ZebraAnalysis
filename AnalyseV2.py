@@ -146,6 +146,7 @@ def program():
                 print("2) Automatically make bar plot of all distance columns.")
                 print("3) Line plot, pixels as Y and frames as X.")
                 print("4) Hex density plot")
+                print("5) Box plot.")
                 print("9) Exit plot menu")
                 print("\n")
 
@@ -311,10 +312,34 @@ def program():
                         print("Something went wrong with the plot. Perhaps chosen fish number is"
                               " invalid")
 
-                ax.set_xlabel("x-coordinates")
-                ax.set_ylabel("y-coordinates")
-                plt.show()
+                    ax.set_xlabel("x-coordinates")
+                    ax.set_ylabel("y-coordinates")
+                    plt.show()
 
+                # --------- Box Plot ---------
+                '''
+                if plot_choice == 5:
+                    box_choice = eval(input("To plot fish, type '1'. To plot groups type '0': "))
+
+                    if box_choice == 1:
+                        try:
+                            df_box = refine_df(df, "dist", 4)
+                            for column in df_box:
+                                df_box_sum = pd.DataFrame(columns=['sum_dist_fish'])
+                                df_box_sum['sum_dist_fish'].append(df_box[column].sum())
+                                df_box = pd.concat([df_box, df_box_sum], axis=1)
+                            print(df_box)
+                            #ax = df_box.plot.box(column=['sum_dist_fish'], title="Distanse per fisk")
+                        except:
+                            print("Something went wrong plotting fish.")
+
+                    if box_choice == 0:
+                        try:
+                            ax = df_avg.plot.box(title="Distanse per gruppe fisk")
+                        except:
+                            print("Something went wrong with the Box plot.")
+                    plt.show()
+                    '''
                     
                 if plot_choice == 9:
                     plot_run = False

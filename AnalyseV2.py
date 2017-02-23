@@ -5,6 +5,17 @@ import numpy as np
 plt.switch_backend('TkAgg')
 style.use('ggplot')
 
+def df_delete_on_word(dataframe, key_wrd):
+    cols = [c for c in dataframe.columns if key_wrd not in c.lower()]
+    dataframe = dataframe[cols]
+
+    return dataframe
+
+def df_contains(dataframe, key_wrd):
+    cols = [c for c in dataframe.columns if key_wrd in c.lower()]
+    dataframe = dataframe[cols]
+
+    return dataframe
 
 def refine_df(dataframe, key_wrd, key_num):
     cols = [c for c in dataframe.columns if c.lower()[:key_num] == key_wrd]
@@ -82,10 +93,10 @@ def program():
         print("8) Clean tables and make distance calculations for each fish")
         print("9) To exit the program")
         print("\n")
-        user_choice = eval(input("What would you like to do?:"))
+        user_choice = input("What would you like to do?:")
         print("")
 
-        if user_choice == 1:
+        if user_choice == '1':
             load_run = True
             while load_run:
 
@@ -113,13 +124,14 @@ def program():
                         print("")
                         load_run = False
                     except:
-                        print("Could not find that file, is it located in the same folder as the program?")
+                        print("Could not find that file, is it located in the same folder as the program?\n")
+
 
                 else:
                     load_run = False
 
 
-        if user_choice == 2:
+        elif user_choice == '2':
             remove = eval(input("How many columns do you want to delete?:"))
 
             for i in range(0, remove):
@@ -127,7 +139,7 @@ def program():
                 try:
                     df.drop([drop_name], axis=1, inplace=True)
                 except:
-                    print("name did not match any columns")
+                    print("name did not match any columns\n")
 
 
 
@@ -135,7 +147,7 @@ def program():
 
 
 
-        if user_choice == 3:
+        elif user_choice == '3':
             plot_run = True
 
             while plot_run:
@@ -168,15 +180,20 @@ def program():
                             sum_col = pd.DataFrame.sum(df[name_bar])
                             bar_dict[label_bar] = sum_col
                         except:
-                            print("something went wrong.")
+                            print("something went wrong.\n")
                             pass
                     try:
+                        title_plot = input("What would you like the title to be?: ")
+                        x_label = input("Label x-axis: ")
+                        y_label = input("Label y-axis: ")
                         list_dict = [bar_dict]
                         bar_df = pd.DataFrame(list_dict)
-                        bar_df.plot.bar()
+                        ax = bar_df.plot.bar(title=title_plot)
+                        ax.set_xlabel(x_label)
+                        ax.set_ylabel(y_label)
                         plt.show()
                     except:
-                        print("Something went wrong with the plotting.")
+                        print("Something went wrong with the plotting.\n")
 
              #   --------   AUTO BAR PLOT ------------
 
@@ -195,7 +212,7 @@ def program():
                         try:
                             antall_bar = count_fish(df, "dist", 4)
                         except:
-                            print("Error, could not find fish count.")
+                            print("Error, could not find fish count.\n")
                         try:
 
                             bar_df = pd.DataFrame
@@ -249,8 +266,20 @@ def program():
                         if error_choice == 0:
                             try:
                                 df_avg_bar = df_avg.sum()
-                                ax = df_avg_bar.plot.bar(title="Average total distance covered per group",
-                                                         colormap='Vega20b')
+                                ax = df_avg_bar.plot.bar(title="Average total distance over groups")
+
+                                # Forsøk på å skille MPP fra de andre ved farge.
+
+                                #df_avg_bar = df_delete_on_word(df_avg, 'mpp')
+                                #df_avg_bar = df_avg_bar.sum()
+                                #df_avg_mpp = df_contains(df_avg, 'mpp')
+                                #df_avg_mpp = df_avg_mpp.sum()
+                                #fig, ax = plt.subplots(2)
+                                #df_avg_bar.plot.bar(title="Average total distance covered per group",
+                                #                         color='blue', ax=ax)
+                                #df_avg_mpp.plot.bar(color='red', ax=ax)
+                                #df_avg_mpp.plot(ax=ax)
+                                #df_avg_bar.plot(ax=ax)
 
                             except:
                                 print("Something went wrong with the plotting.")
@@ -267,8 +296,8 @@ def program():
                             except:
                                 print("Something went wrong with the plot.")
 
-                        ax.set_ylabel("Distance (pixels)")
-                        ax.set_xlabel("Groups")
+                        #ax.set_ylabel("Distance (pixels)")
+                        #ax.set_xlabel("Groups")
                         plt.show()
 
 
@@ -345,7 +374,7 @@ def program():
                     plot_run = False
 
 
-        if user_choice == 4:
+        elif user_choice == '4':
             try:
                 print(df)
             except:
@@ -353,7 +382,7 @@ def program():
 
         # -------------- SAVE FUNCTION ---------------
 
-        if user_choice == 5:
+        elif user_choice == '5':
             print("1) to save as .txt")
             print("2) to save as excel format.")
             format_choice = eval(input("Which format to save in (1 or 2)?: "))
@@ -393,7 +422,7 @@ def program():
         # ----------- DISTANCE CALCULATIONS MENU -------------------
 
 
-        if user_choice == 6:
+        elif user_choice == '6':
             distance_menu = True
             while distance_menu:
                 print("\n")
@@ -418,26 +447,34 @@ def program():
                 # - Mean distance for group -
 
                 if distance_menu_choice == 2:
-                    print("NOTE: This step will create a new column")
+                    print("NOTE: This step will create a new column\n")
                     print("It will also create a new DataFrame called 'df_avg' where it will")
                     print("make this group's average appear, this is so that you can load")
                     print("a different group and do the same calculation, and now have both")
-                    print("averages in the same DataFrame to compare them more easily.")
+                    print("averages in the same DataFrame to compare them more easily.\n")
 
                     col_avg_name = "group_avg_dist_" + input("Name your group average column: ")
                     print("")
                     print("New column was named: " + col_avg_name)
+                    print("")
 
 
                     try:
-                        cols = [c for c in df.columns if c.lower()[:4] == 'dist']
-                        df[col_avg_name] = df[cols].mean(axis=1)
+                        df[col_avg_name] = refine_df(df, 'dist', 4).mean(axis=1)
+                        #df_sum_fisk = pd.DataFrame
+
+                        #for column in refine_df(df, 'dist', 4):
+                         #   df_sum_fisk[column] = df[column].sum()
+
+                        #cols = [c for c in df.columns if c.lower()[:4] == 'dist']
+                        #df[col_avg_name] = df[cols].mean(axis=1)
                         print("")
                         print("Total mean distance for the group:")
                         print(df[col_avg_name].sum())
                         print("Pixels over " + str(len(df.index)) + " frames.")
                         print("")
                         df_avg[col_avg_name] = df[col_avg_name]
+                        #df_avg[col_avg_name + '_STD'] = df_sum_fisk.std()
                         print("Column " + col_avg_name + " was added to the DataFrame 'df_avg'.")
 
                     except:
@@ -447,7 +484,7 @@ def program():
                     distance_menu = False
                     print("Exiting distance menu..")
 
-        if user_choice == 8:
+        elif user_choice == '8':
             #num_fish = eval(input("How many fish are in this group?: "))
             try:
                 #Looks for all columns starting with 'x', and assuming this is the x-coordinate column
@@ -465,9 +502,14 @@ def program():
                 print("Something went wrong")
 
 
-        if user_choice == 9:
+        elif user_choice == '9':
             run = False
             print("Exiting program..")
+
+        else:
+            print("!!  Invalid choice  !!")
+            print("Please choose an option from the menu, and type its respective number.")
+            print("")
 
 
 program()

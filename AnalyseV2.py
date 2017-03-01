@@ -159,7 +159,8 @@ def program():
                 print("3) Line plot, pixels as Y and frames as X.")
                 print("4) Hex density plot")
                 print("5) Box plot.")
-                print("9) Exit plot menu")
+                print("6) Histogram plot for speed.")
+                print("9) Exit plot menu.")
                 print("\n")
 
                 plot_choice = eval(input("What would you like to do?: "))
@@ -369,7 +370,45 @@ def program():
                             print("Something went wrong with the Box plot.")
                     plt.show()
                     '''
-                    
+
+                # --------- Speed plot in histogram----------
+
+                if plot_choice == 6:
+                    try:
+                        hist_choice = eval(input("1) To plot al fish in DataFrame \n"
+                                           "0) To chose which fish to plot: "))
+
+                    except:
+                        print("Invalid choice.")
+
+                    if hist_choice == 1:
+                        try:
+                            df_speed = refine_df(df, "dist", 4)
+
+                            ax = df_speed.plot.hist(bins=20, logy=True, colormap='Vega20b')
+                            ax.set_xlabel("Speed in pixels/frame.")
+                            ax.set_ylabel("Number of frames spent in speed range.")
+                            plt.show()
+                        except:
+                            print("Something went wrong with the histogram plot.")
+
+                    if hist_choice == 0:
+                        num_fish = count_fish(df, "dist", 4)
+                        print("There are " + str(num_fish) + " fish in your DataFrame.")
+                        hist_fish = eval(input("Which fish do you want to plot? (1-"
+                                               + str(num_fish) + "): "))
+                        try:
+                            ax = df_speed["dist_fish_"+str(hist_fish)].plot.hist(
+                                bins=20, logy=True, colormap='Vega20b')
+
+                            ax.set_xlabel("Speed in pixels/frame")
+                            ax.set_ylabel("Number of frames spent in speed range.")
+                            plt.show()
+                        except:
+                            print("Something went wrong trying to make the histogram")
+
+
+
                 if plot_choice == 9:
                     plot_run = False
 

@@ -375,8 +375,8 @@ def program():
 
                 if plot_choice == 6:
                     try:
-                        hist_choice = eval(input("1) To plot al fish in DataFrame \n"
-                                           "0) To chose which fish to plot: "))
+                        hist_choice = eval(input("1) To plot al. fish in DataFrame \n"
+                                           "0) To choose which fish to plot: "))
 
                     except:
                         print("Invalid choice.")
@@ -399,7 +399,8 @@ def program():
                                                + str(num_fish) + "): "))
                         try:
                             ax = df_speed["dist_fish_"+str(hist_fish)].plot.hist(
-                                bins=20, logy=True, colormap='Vega20b')
+                                bins=20, logy=True, colormap='Vega20b',
+                                title="Fish-"+str(num_fish))
 
                             ax.set_xlabel("Speed in pixels/frame")
                             ax.set_ylabel("Number of frames spent in speed range.")

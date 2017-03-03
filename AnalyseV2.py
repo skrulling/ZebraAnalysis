@@ -55,9 +55,11 @@ def clean_calc(dataframe, num_fish):
             dataframe[new_column_name_y] = dataframe[fish_y].diff()
 
             # Make Them Smooth
+            # Change the value here to filter out more, or less noise
+            # in movement
 
-            dataframe.ix[dataframe[new_column_name_x] < 1, new_column_name_x] = 0
-            dataframe.ix[dataframe[new_column_name_y] < 1, new_column_name_y] = 0
+            dataframe.ix[dataframe[new_column_name_x] < 2, new_column_name_x] = 0
+            dataframe.ix[dataframe[new_column_name_y] < 2, new_column_name_y] = 0
 
         except:
             print("Oh noes, that did not go as planned!")
@@ -375,7 +377,7 @@ def program():
 
                 if plot_choice == 6:
                     try:
-                        hist_choice = eval(input("1) To plot al. fish in DataFrame \n"
+                        hist_choice = eval(input("1) To plot all fish in DataFrame \n"
                                            "0) To choose which fish to plot: "))
 
                     except:
@@ -400,7 +402,7 @@ def program():
                         try:
                             ax = df_speed["dist_fish_"+str(hist_fish)].plot.hist(
                                 bins=20, logy=True, colormap='Vega20b',
-                                title="Fish-"+str(num_fish))
+                                title="Fish-"+str(hist_fish))
 
                             ax.set_xlabel("Speed in pixels/frame")
                             ax.set_ylabel("Number of frames spent in speed range.")
@@ -525,10 +527,11 @@ def program():
                     print("Exiting distance menu..")
 
         elif user_choice == '8':
-            #num_fish = eval(input("How many fish are in this group?: "))
+
             try:
                 #Looks for all columns starting with 'x', and assuming this is the x-coordinate column
                 #for a fish, so it counts it. If other columns start with 'x', count will be wrong.
+
                 num_fish_count = count_fish(df, "X", 1)
                 print(num_fish_count)
             except:

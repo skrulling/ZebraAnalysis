@@ -387,6 +387,11 @@ def program():
                         try:
                             df_speed = refine_df(df, "dist", 4)
 
+                            # Makes all 0 values NaN, so they are not included in the histogram
+                            for column in df_speed:
+                                df_speed.ix[df_speed[column] < 2, column] = np.NaN
+
+
                             ax = df_speed.plot.hist(bins=20, logy=True, colormap='Vega20b')
                             ax.set_xlabel("Speed in pixels/frame.")
                             ax.set_ylabel("Number of frames spent in speed range.")
@@ -400,7 +405,11 @@ def program():
                         hist_fish = eval(input("Which fish do you want to plot? (1-"
                                                + str(num_fish) + "): "))
                         try:
-                            ax = df_speed["dist_fish_"+str(hist_fish)].plot.hist(
+                            #column = "dist_fish_"+str(hist_fish)
+                            #df_speed[column] = df[column]
+                            #df_speed.ix[df_speed[column] < 2, column] = np.NAN
+
+                            ax = df["dist_fish_"+str(hist_fish)].plot.hist(
                                 bins=20, logy=True, colormap='Vega20b',
                                 title="Fish-"+str(hist_fish))
 

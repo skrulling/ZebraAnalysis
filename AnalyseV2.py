@@ -171,13 +171,35 @@ def program():
 
 
                 if plot_choice == 1:
-                    antall_bar = eval(input("How many columns do you want to plot?: "))
+                    #antall_bar = eval(input("How many columns do you want to plot?: "))
+                    print("Which groups would you like to plot?")
+                    print("Type number of groups separated by space example:(1 4 5 6)\n")
+
+                    counter = 0
+                    for group in pd.DataFrame(df):
+                        counter = counter + 1
+                        print(str(counter)+ ") " + group)
+                    user_bar_list = [int(x) for x in input().split()]
                     bar_df = pd.DataFrame
                     bar_dict = {}
+                    print(user_bar_list)
 
+                    counter = 0
+                    for group in pd.DataFrame(df):
+                        counter = counter + 1
+                        for number in user_bar_list:
+                            if counter == number:
+                                label_bar = input("What would you like to call "
+                                                  "the column " + group + ": \n")
+                                sum_col = pd.DataFrame.sum(df[group])
+                                bar_dict[label_bar] = sum_col
+                            else:
+                                continue
+
+
+                    '''
                     for bars in range(0, antall_bar):
                         try:
-
                             name_bar = input("Which column would you like to plot?: ")
                             label_bar = input("Label: ")
                             sum_col = pd.DataFrame.sum(df[name_bar])
@@ -185,6 +207,7 @@ def program():
                         except:
                             print("something went wrong.\n")
                             pass
+                    '''
                     try:
                         title_plot = input("What would you like the title to be?: ")
                         x_label = input("Label x-axis: ")
@@ -195,6 +218,7 @@ def program():
                         ax.set_xlabel(x_label)
                         ax.set_ylabel(y_label)
                         plt.show()
+
                     except:
                         print("Something went wrong with the plotting.\n")
 

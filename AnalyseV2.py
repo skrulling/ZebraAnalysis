@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import style
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 plt.switch_backend('TkAgg')
 style.use('ggplot')
 
@@ -162,6 +163,7 @@ def program():
                 print("4) Hex density plot")
                 print("5) Box plot.")
                 print("6) Histogram plot for speed.")
+                print("7) 3D-plot showing position over time.")
                 print("9) Exit plot menu.")
                 print("\n")
 
@@ -363,13 +365,13 @@ def program():
                     try:
                         hex_fish = eval(input("Which fish would you like to plot?(enter number): "))
                         ax = df.plot.hexbin(x='X'+str(hex_fish), y='Y'+str(hex_fish), gridsize=15,
-                                            title="Fisk-"+str(hex_fish))
+                                            title="Fish-"+str(hex_fish))
                     except:
                         print("Something went wrong with the plot. Perhaps chosen fish number is"
                               " invalid")
 
-                    ax.set_xlabel("x-coordinates")
-                    ax.set_ylabel("y-coordinates")
+                    ax.set_xlabel("X-coordinates")
+                    ax.set_ylabel("Y-coordinates")
                     plt.show()
 
                 # --------- Box Plot ---------
@@ -442,6 +444,24 @@ def program():
                             plt.show()
                         except:
                             print("Something went wrong trying to make the histogram")
+
+                if plot_choice == 7:
+                    num_fish = count_fish(df, "dist", 4)
+                    print("There are " + str(num_fish) + " fish in your DataFrame.")
+                    threed_line = eval(input("Which fish do you want to plot? (1-"
+                                            + str(num_fish) + "): "))
+
+                    try:
+                        threed_plot = plt.figure().gca(projection='3d')
+                        threed_plot.plot(df["X"+str(threed_line)], df["Y"+str(threed_line)], df.index)
+                        threed_plot.set_title("Position in 2D space over time for fish " + str(threed_line))
+                        threed_plot.set_xlabel("X-Axis")
+                        threed_plot.set_ylabel("Y-Axis")
+                        threed_plot.set_zlabel("Time/Frame")
+                        plt.show()
+
+                    except:
+                        print("Something went wrong with the plot!")
 
 
 

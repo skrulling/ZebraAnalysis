@@ -2,6 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import style
 import numpy as np
+
+#This import is just to use the Seaborn style on plots
+import seaborn as sns
+
 from mpl_toolkits.mplot3d import Axes3D
 plt.switch_backend('TkAgg')
 style.use('ggplot')
@@ -434,8 +438,9 @@ def program():
                             #column = "dist_fish_"+str(hist_fish)
                             #df_speed[column] = df[column]
                             #df_speed.ix[df_speed[column] < 2, column] = np.NAN
+                            name_col = "dist_fish_"+str(hist_fish)
 
-                            ax = df["dist_fish_"+str(hist_fish)].plot.hist(
+                            ax = df[name_col].plot.hist(
                                 bins=20, logy=True, colormap='Vega20b',
                                 title="Fish-"+str(hist_fish))
 
@@ -444,6 +449,8 @@ def program():
                             plt.show()
                         except:
                             print("Something went wrong trying to make the histogram")
+
+                # ---------- 3D PLOT -----------
 
                 if plot_choice == 7:
                     num_fish = count_fish(df, "dist", 4)
@@ -455,8 +462,8 @@ def program():
                         threed_plot = plt.figure().gca(projection='3d')
                         threed_plot.plot(df["X"+str(threed_line)], df["Y"+str(threed_line)], df.index)
                         threed_plot.set_title("Position in 2D space over time for fish " + str(threed_line))
-                        threed_plot.set_xlabel("X-Axis")
-                        threed_plot.set_ylabel("Y-Axis")
+                        threed_plot.set_xlabel("X-Coordinate")
+                        threed_plot.set_ylabel("Y-Coordinate")
                         threed_plot.set_zlabel("Time/Frame")
                         plt.show()
 

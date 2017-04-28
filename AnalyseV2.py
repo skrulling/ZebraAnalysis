@@ -1,6 +1,8 @@
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import style
+from matplotlib.ticker import ScalarFormatter
 import numpy as np
 
 #This import is just to use the Seaborn style on plots
@@ -139,14 +141,25 @@ def program():
 
 
         elif user_choice == '2':
-            remove = eval(input("How many columns do you want to delete?:"))
+            print("Which columns would you like to delete?")
+            print("Type number of columns separated by space example:(1 4 5 6)\n")
 
-            for i in range(0, remove):
-                drop_name = input("Name the column you want to remove:")
-                try:
-                    df.drop([drop_name], axis=1, inplace=True)
-                except:
-                    print("name did not match any columns\n")
+            counter = 0
+            for group in pd.DataFrame(df):
+                counter = counter + 1
+                print(str(counter) + ") " + group)
+            user_bar_list = [int(x) for x in input().split()]
+
+            counter = 0
+            for group in pd.DataFrame(df):
+                counter = counter + 1
+                for number in user_bar_list:
+                    if counter == number:
+                        df.drop([group], axis=1, inplace=True)
+                        print("Deleted column " + str(counter))
+                    else:
+                        continue
+
 
 
 
@@ -165,7 +178,7 @@ def program():
                 print("2) Automatically make bar plot of all distance columns.")
                 print("3) Line plot, pixels as Y and frames as X.")
                 print("4) Hex density plot")
-                print("5) Box plot.")
+                print("5) Box plot. - Not yet implemented")
                 print("6) Histogram plot for speed.")
                 print("7) 3D-plot showing position over time.")
                 print("9) Exit plot menu.")
@@ -177,7 +190,6 @@ def program():
 
 
                 if plot_choice == 1:
-                    #antall_bar = eval(input("How many columns do you want to plot?: "))
                     print("Which groups would you like to plot?")
                     print("Type number of groups separated by space example:(1 4 5 6)\n")
 
@@ -203,17 +215,6 @@ def program():
                                 continue
 
 
-                    '''
-                    for bars in range(0, antall_bar):
-                        try:
-                            name_bar = input("Which column would you like to plot?: ")
-                            label_bar = input("Label: ")
-                            sum_col = pd.DataFrame.sum(df[name_bar])
-                            bar_dict[label_bar] = sum_col
-                        except:
-                            print("something went wrong.\n")
-                            pass
-                    '''
                     try:
                         title_plot = input("What would you like the title to be?: ")
                         x_label = input("Label x-axis: ")
@@ -264,7 +265,7 @@ def program():
 
                                     ax = bar_df.plot.bar(title="Total distance covered per fish",
                                                          colormap='Vega20b')
-                                    ax.set_xlabel("Fisk")
+                                    ax.set_xlabel("Fish")
                                     ax.set_ylabel("Distance (pixels)")
                                     plt.show()
 
@@ -415,6 +416,7 @@ def program():
 
                     if hist_choice == 1:
                         try:
+                            hist_title = input("Enter title of plot: ")
                             df_speed = refine_df(df, "dist", 4)
 
                             # Makes all 0 values NaN, so they are not included in the histogram
@@ -422,7 +424,7 @@ def program():
                                 df_speed.ix[df_speed[column] < 2, column] = np.NaN
 
 
-                            ax = df_speed.plot.hist(bins=20, logy=True, colormap='Vega20b')
+                            ax = df_speed.plot.hist(title=hist_title ,bins=20, logy=True, colormap='Vega20b')
                             ax.set_xlabel("Speed in pixels/frame.")
                             ax.set_ylabel("Number of frames spent in speed range.")
                             plt.show()
@@ -446,6 +448,8 @@ def program():
 
                             ax.set_xlabel("Speed in pixels/frame")
                             ax.set_ylabel("Number of frames spent in speed range.")
+                            ax.set_yticks([1, 5, 10, 50, 100, 200, 500, 1000, 5000, 10000])
+                            ax.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
                             plt.show()
                         except:
                             print("Something went wrong trying to make the histogram")
